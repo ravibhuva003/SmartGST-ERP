@@ -9,6 +9,7 @@ import { CustomerModule } from './customer/customer.module';
 import { ItemModule } from './item/item.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { VendorModule } from './vendor/vendor.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { VendorModule } from './vendor/vendor.module';
     ItemModule,
     InvoiceModule,
     VendorModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
