@@ -27,7 +27,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="#" className="text-sm font-medium text-primary hover:underline">
+                <Link href="/auth/forgot-password" className="text-sm font-medium text-primary hover:underline">
                   Forgot password?
                 </Link>
               </div>
@@ -51,12 +51,20 @@ export default function LoginPage() {
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" type="button" onClick={() => alert('Google login coming soon!')}>
-              Google
-            </Button>
-            <Button variant="outline" type="button" onClick={() => alert('OTP login coming soon!')}>
-              Mobile OTP
-            </Button>
+            <form action={async () => {
+              'use server'
+              const { googleLoginAction } = await import('@/app/actions/auth')
+              await googleLoginAction()
+            }}>
+              <Button variant="outline" type="submit" className="w-full">
+                Google
+              </Button>
+            </form>
+            <Link href="/auth/otp">
+              <Button variant="outline" type="button" className="w-full">
+                Mobile OTP
+              </Button>
+            </Link>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
