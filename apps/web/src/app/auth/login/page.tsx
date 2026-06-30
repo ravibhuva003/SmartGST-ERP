@@ -15,7 +15,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold tracking-tight">SmartGST ERP</CardTitle>
+          <CardTitle className="text-3xl font-bold tracking-tight">Ekcero GST ERP</CardTitle>
           <CardDescription>Enter your email below to login to your account</CardDescription>
         </CardHeader>
         <CardContent>
@@ -40,6 +40,24 @@ export default function LoginPage() {
               {isPending ? 'Logging in...' : 'Login'}
             </Button>
           </form>
+          
+          <div className="relative mt-6 mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-200 dark:border-gray-700" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white dark:bg-gray-900 px-2 text-gray-500">Or continue with</span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <Button variant="outline" type="button" onClick={() => alert('Google login coming soon!')}>
+              Google
+            </Button>
+            <Button variant="outline" type="button" onClick={() => alert('OTP login coming soon!')}>
+              Mobile OTP
+            </Button>
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-sm text-center text-gray-500">

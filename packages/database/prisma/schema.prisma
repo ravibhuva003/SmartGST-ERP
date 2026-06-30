@@ -158,11 +158,12 @@ model Invoice {
   vendorId      String?
   type          DocumentType  @default(SALES_INVOICE)
   invoiceNumber String
-  date          DateTime
-  totalAmount   Decimal
-  cgst          Decimal
-  sgst          Decimal
-  igst          Decimal
+  issueDate     DateTime
+  dueDate       DateTime?
+  subTotal      Decimal       @default(0)
+  taxTotal      Decimal       @default(0)
+  grandTotal    Decimal       @default(0)
+  status        String        @default("UNPAID")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)

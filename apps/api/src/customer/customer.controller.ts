@@ -36,4 +36,14 @@ export class CustomerController {
   remove(@Param('id') id: string) {
     return this.customerService.remove(id);
   }
+
+  @Post('validate-gstin')
+  validateGstin(@Body('gstin') gstin: string) {
+    return this.customerService.validateGstin(gstin);
+  }
+
+  @Post(':id/send-reminder')
+  sendReminder(@Param('id') id: string) {
+    return this.customerService.sendPaymentReminder(id);
+  }
 }

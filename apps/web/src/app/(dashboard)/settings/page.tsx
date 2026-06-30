@@ -42,6 +42,8 @@ export default function SettingsPage() {
           <TabsTrigger value="general">General Profile</TabsTrigger>
           <TabsTrigger value="tax">Tax & Legal</TabsTrigger>
           <TabsTrigger value="branding">Branding</TabsTrigger>
+          <TabsTrigger value="branches">Branches</TabsTrigger>
+          <TabsTrigger value="team">Team Management</TabsTrigger>
         </TabsList>
 
         <form onSubmit={handleSubmit}>
@@ -125,6 +127,84 @@ export default function SettingsPage() {
                   
                   {/* Non-functional mock upload button */}
                   <Button type="button" variant="outline" className="mt-6">Select File</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* BRANCHES TAB */}
+          <TabsContent value="branches" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Branches & Locations</CardTitle>
+                <CardDescription>Manage your company's offices, warehouses, and GSTIN branches.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-semibold">Registered Branches</h3>
+                  <Button type="button" variant="outline" size="sm">+ Add Branch</Button>
+                </div>
+                <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+                      <tr>
+                        <th className="px-4 py-3 font-medium">Branch Name</th>
+                        <th className="px-4 py-3 font-medium">GSTIN</th>
+                        <th className="px-4 py-3 font-medium">State Code</th>
+                        <th className="px-4 py-3 font-medium text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-slate-200 dark:border-slate-800">
+                        <td className="px-4 py-3 font-medium">Head Office</td>
+                        <td className="px-4 py-3 text-slate-500">27ABCDE1234F1Z5</td>
+                        <td className="px-4 py-3 text-slate-500">27</td>
+                        <td className="px-4 py-3 text-right">
+                          <Button type="button" variant="ghost" size="sm">Edit</Button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* TEAM TAB */}
+          <TabsContent value="team" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Team Management</CardTitle>
+                <CardDescription>Invite members to your company and assign roles.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-semibold">Active Members</h3>
+                  <Button type="button" variant="outline" size="sm">+ Invite Member</Button>
+                </div>
+                <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+                      <tr>
+                        <th className="px-4 py-3 font-medium">Name</th>
+                        <th className="px-4 py-3 font-medium">Email</th>
+                        <th className="px-4 py-3 font-medium">Role</th>
+                        <th className="px-4 py-3 font-medium">Branch Access</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-slate-200 dark:border-slate-800">
+                        <td className="px-4 py-3 font-medium">John Doe (You)</td>
+                        <td className="px-4 py-3 text-slate-500">contact@ekcero.com</td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
+                            Company Owner
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-slate-500">All Branches</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </CardContent>
             </Card>

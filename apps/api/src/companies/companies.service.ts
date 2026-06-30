@@ -92,18 +92,52 @@ export class CompaniesService {
     }
 
     // Ensure we only update allowed fields
-    const { name, pan, gstin, address, website, logo } = data;
+    const { name, panNumber, website, contactEmail, logoUrl } = data;
 
     return this.prisma.company.update({
       where: { id },
       data: {
         ...(name && { name }),
-        ...(pan && { pan }),
-        ...(gstin && { gstin }),
-        ...(address && { address }),
+        ...(panNumber && { panNumber }),
         ...(website && { website }),
-        ...(logo && { logo }),
+        ...(contactEmail && { contactEmail }),
+        ...(logoUrl && { logoUrl }),
       },
+    });
+  }
+
+  async getTeamMembers(companyId: string, userId: string) {
+    const access = await this.prisma.companyUser.findFirst({
+      where: { userId, companyId },
+    });
+    if (!access) throw new ForbiddenException('Access denied');
+
+    return this.prisma.companyUser.findMany({
+      where: { companyId },
+      include: { user: { select: { id: true, name: true, email: true, phone: true } }, branch: true }
+    });
+  }
+
+  async inviteTeamMember(companyId: string, data: any, userId: string) {
+    const access = await this.prisma.companyUser.findFirst({
+      where: { userId, companyId },
+    });
+    if (!access || access.role !== 'COMPANY_OWNER') throw new ForbiddenException('Only owners can invite');
+
+    let invitee = await this.prisma.user.findUnique({ where: { email: data.email } });
+    if (!invitee) {
+      invitee = await this.prisma.user.create({
+        data: { email: data.email, name: data.name, isEmailVerified: false }
+      });
+    }
+
+    return this.prisma.companyUser.create({
+      data: {
+        userId: invitee.id,
+        companyId,
+        branchId: data.branchId || null,
+        role: data.role || 'READ_ONLY'
+      }
     });
   }
 }

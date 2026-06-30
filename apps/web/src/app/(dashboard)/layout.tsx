@@ -43,7 +43,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               S
             </div>
             <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-              SmartGST ERP
+              Ekcero GST ERP
             </span>
           </div>
         </div>
@@ -85,7 +85,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Mobile Header */}
         <header className="md:hidden h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center px-4">
-          <div className="font-bold text-lg">SmartGST ERP</div>
+          <div className="font-bold text-lg">Ekcero GST ERP</div>
         </header>
 
         {/* Scrollable Main */}

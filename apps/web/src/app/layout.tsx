@@ -13,8 +13,8 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "SmartGST ERP",
-  description: "Advanced GST Billing & ERP Platform",
+  title: "Ekcero GST ERP | Modern Indian GST Billing",
+  description: "Enterprise grade GST billing, inventory, and compliance software for Indian businesses. By Ekcero Infotech.",
 };
 
 export default function RootLayout({

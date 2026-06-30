@@ -10,6 +10,9 @@ import { ItemModule } from './item/item.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { VendorModule } from './vendor/vendor.module';
 import { CategoryModule } from './category/category.module';
+import { PaymentsModule } from './payments/payments.module';
+import { ReportsModule } from './reports/reports.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { CategoryModule } from './category/category.module';
     InvoiceModule,
     VendorModule,
     CategoryModule,
+    PaymentsModule,
+    ReportsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

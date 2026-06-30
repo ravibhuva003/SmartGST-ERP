@@ -35,4 +35,18 @@ export class CompaniesController {
   getBranches(@Param('id') id: string, @Request() req: any) {
     return this.companiesService.getBranches(id, req.user.sub);
   }
+
+  @Get(':id/users')
+  getTeamMembers(@Param('id') id: string, @Request() req: any) {
+    return this.companiesService.getTeamMembers(id, req.user.sub);
+  }
+
+  @Post(':id/users')
+  inviteTeamMember(
+    @Param('id') id: string,
+    @Body() userData: any,
+    @Request() req: any,
+  ) {
+    return this.companiesService.inviteTeamMember(id, userData, req.user.sub);
+  }
 }

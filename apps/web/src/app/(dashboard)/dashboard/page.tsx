@@ -2,22 +2,33 @@ import Link from 'next/link'
 import { Plus, Users, FileText, Package, TrendingUp, IndianRupee } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { fetchAPI } from '@/lib/api'
 
-const kpiData = [
-  { title: 'Total Revenue', value: '₹ 2,45,000', description: '+20% from last month', icon: IndianRupee, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-  { title: 'Outstanding', value: '₹ 45,200', description: '5 invoices pending', icon: TrendingUp, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-  { title: 'Total Customers', value: '142', description: '+12 new this month', icon: Users, color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
-  { title: 'Inventory Items', value: '84', description: '12 items low on stock', icon: Package, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-]
+export default async function DashboardPage() {
+  let invoices = []
+  let kpis = {
+    totalRevenue: 0,
+    outstandingAmount: 0,
+    totalInvoicesCount: 0,
+    outstandingInvoicesCount: 0,
+    totalCustomers: 0,
+    totalItems: 0
+  }
 
-const recentInvoices = [
-  { id: 'INV-2023-001', customer: 'Acme Corp', amount: 15400, date: '2023-10-25', status: 'Paid' },
-  { id: 'INV-2023-002', customer: 'Stark Industries', amount: 8200, date: '2023-10-26', status: 'Unpaid' },
-  { id: 'INV-2023-003', customer: 'Wayne Enterprises', amount: 45000, date: '2023-10-28', status: 'Paid' },
-  { id: 'INV-2023-004', customer: 'Daily Planet', amount: 1200, date: '2023-10-29', status: 'Unpaid' },
-]
+  try {
+    invoices = await fetchAPI('/invoices?limit=5', { cache: 'no-store' })
+    kpis = await fetchAPI('/dashboard/kpis', { cache: 'no-store' })
+  } catch (error) {
+    console.error('Failed to fetch dashboard data:', error)
+  }
 
-export default function DashboardPage() {
+  const kpiData = [
+    { title: 'Total Revenue', value: `₹ ${Number(kpis.totalRevenue).toLocaleString()}`, description: `${kpis.totalInvoicesCount} total invoices`, icon: IndianRupee, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    { title: 'Outstanding', value: `₹ ${Number(kpis.outstandingAmount).toLocaleString()}`, description: `${kpis.outstandingInvoicesCount} invoices pending`, icon: TrendingUp, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    { title: 'Total Customers', value: kpis.totalCustomers.toString(), description: 'Active clients', icon: Users, color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
+    { title: 'Inventory Items', value: kpis.totalItems.toString(), description: 'Products in catalog', icon: Package, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+  ]
+
   return (
     <div className="space-y-8">
       {/* Header & Quick Actions */}
@@ -80,15 +91,15 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {recentInvoices.map((inv) => (
+                  {invoices.slice(0, 5).map((inv: any) => (
                     <tr key={inv.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
-                      <td className="p-4 font-medium text-indigo-600 dark:text-indigo-400">{inv.id}</td>
-                      <td className="p-4">{inv.customer}</td>
-                      <td className="p-4 text-slate-500">{inv.date}</td>
-                      <td className="p-4 text-right font-medium">₹ {inv.amount.toLocaleString()}</td>
+                      <td className="p-4 font-medium text-indigo-600 dark:text-indigo-400">{inv.invoiceNumber}</td>
+                      <td className="p-4">{inv.customer?.name || 'Unknown'}</td>
+                      <td className="p-4 text-slate-500">{new Date(inv.issueDate).toLocaleDateString()}</td>
+                      <td className="p-4 text-right font-medium">₹ {Number(inv.grandTotal).toLocaleString()}</td>
                       <td className="p-4 text-right">
                         <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ring-1 ring-inset ${
-                          inv.status === 'Paid' 
+                          inv.status === 'PAID' 
                             ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400' 
                             : 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-400'
                         }`}>
@@ -97,6 +108,13 @@ export default function DashboardPage() {
                       </td>
                     </tr>
                   ))}
+                  {invoices.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-slate-500">
+                        No recent invoices found.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

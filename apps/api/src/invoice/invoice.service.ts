@@ -6,35 +6,59 @@ export class InvoiceService {
   constructor(private prisma: PrismaService) {}
 
   async create(userId: string, data: any) {
-    const { companyId, customerId, type, invoiceNumber, date, items } = data;
+    const { 
+      companyId, 
+      customerId, 
+      type, 
+      invoiceNumber, 
+      issueDate,
+      dueDate,
+      subTotal,
+      taxTotal,
+      grandTotal,
+      items 
+    } = data;
 
     // Verify user has access to this company
     const access = await this.prisma.companyUser.findFirst({
-      where: { userId, companyId }
+      where: { userId, companyId },
+      include: { company: true }
     });
 
     if (!access) {
       throw new ForbiddenException('You do not have access to this company');
     }
 
-    // Calculate Totals based on items
-    let totalAmount = 0;
-    let totalCgst = 0;
-    let totalSgst = 0;
-    let totalIgst = 0;
+    const companyStateCode = '27'; // Default to Maharashtra if not set (for MVP). Should be access.company.stateCode or branch.stateCode
+    let destinationStateCode = companyStateCode;
 
-    const formattedItems = items.map((item: any) => {
+    if (customerId) {
+      const customer = await this.prisma.customer.findUnique({ where: { id: customerId } });
+      if (customer?.stateCode) destinationStateCode = customer.stateCode;
+    } else if (data.vendorId) {
+      const vendor = await this.prisma.vendor.findUnique({ where: { id: data.vendorId } });
+      if (vendor?.stateCode) destinationStateCode = vendor.stateCode;
+    }
+
+    const isInterState = companyStateCode !== destinationStateCode;
+
+    // Format items with precise GST split
+    const formattedItems = (items || []).map((item: any) => {
+      const rate = Number(item.unitPrice) || 0;
       const quantity = Number(item.quantity) || 0;
-      const rate = Number(item.rate) || 0;
-      const amount = quantity * rate;
-      const cgst = Number(item.cgst) || 0;
-      const sgst = Number(item.sgst) || 0;
-      const igst = Number(item.igst) || 0;
+      const amount = Number(item.totalAmount) || (rate * quantity);
+      const taxAmount = Number(item.taxAmount) || 0;
 
-      totalAmount += amount + cgst + sgst + igst;
-      totalCgst += cgst;
-      totalSgst += sgst;
-      totalIgst += igst;
+      let cgst = 0;
+      let sgst = 0;
+      let igst = 0;
+
+      if (isInterState) {
+        igst = Number(taxAmount.toFixed(2));
+      } else {
+        cgst = Number((taxAmount / 2).toFixed(2));
+        sgst = Number((taxAmount / 2).toFixed(2));
+      }
 
       return {
         itemId: item.itemId,
@@ -54,12 +78,13 @@ export class InvoiceService {
           companyId,
           customerId,
           type: type || 'SALES_INVOICE',
-          invoiceNumber,
-          date: new Date(date),
-          totalAmount,
-          cgst: totalCgst,
-          sgst: totalSgst,
-          igst: totalIgst,
+          invoiceNumber: invoiceNumber || `INV-${Date.now()}`,
+          issueDate: new Date(issueDate),
+          dueDate: dueDate ? new Date(dueDate) : null,
+          subTotal: Number(subTotal) || 0,
+          taxTotal: Number(taxTotal) || 0,
+          grandTotal: Number(grandTotal) || 0,
+          status: 'UNPAID',
           items: {
             create: formattedItems
           }
@@ -70,16 +95,21 @@ export class InvoiceService {
         }
       });
 
-      // Update inventory stock (Optional/Basic)
+      // Update inventory stock
       for (const item of formattedItems) {
-        await tx.item.update({
-          where: { id: item.itemId },
-          data: {
-            stock: {
-              decrement: type === 'PURCHASE_INVOICE' ? -item.quantity : item.quantity
-            }
+        if (item.itemId) {
+          if (type === 'PURCHASE_INVOICE') {
+            await tx.item.update({
+              where: { id: item.itemId },
+              data: { stock: { increment: item.quantity } }
+            });
+          } else if (type === 'SALES_INVOICE' || type === 'DELIVERY_CHALLAN') {
+            await tx.item.update({
+              where: { id: item.itemId },
+              data: { stock: { decrement: item.quantity } }
+            });
           }
-        });
+        }
       }
 
       return invoice;
@@ -105,7 +135,7 @@ export class InvoiceService {
         vendor: true
       },
       orderBy: {
-        date: 'desc'
+        issueDate: 'desc'
       }
     });
   }

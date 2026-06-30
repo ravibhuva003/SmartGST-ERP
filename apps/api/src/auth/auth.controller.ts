@@ -44,4 +44,35 @@ export class AuthController {
   getProfile(@Request() req: any) {
     return req.user;
   }
+
+  @Post('google')
+  async googleLogin(
+    @Body('idToken') idToken: string,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent: string
+  ) {
+    return this.authService.googleLogin(idToken, ip, userAgent);
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body('email') email: string) {
+    return this.authService.forgotPassword(email);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() body: any) {
+    return this.authService.resetPassword(body.token, body.password);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('2fa/generate')
+  async generate2FA(@Request() req: any) {
+    return this.authService.generateTwoFactorSecret(req.user.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('2fa/turn-on')
+  async turnOn2FA(@Request() req: any, @Body('code') code: string) {
+    return this.authService.turnOnTwoFactorAuth(req.user.sub, code);
+  }
 }

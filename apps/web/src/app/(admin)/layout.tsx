@@ -16,7 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900">
       <header className="flex h-16 items-center px-4 border-b bg-gray-900 text-white">
-        <div className="text-xl font-bold mr-8">SmartGST Super Admin</div>
+        <div className="text-xl font-bold mr-8">Ekcero GST Super Admin</div>
         <nav className="flex items-center space-x-4">
           <Link href="/admin" className="text-sm font-medium hover:text-gray-300">
             Overview
