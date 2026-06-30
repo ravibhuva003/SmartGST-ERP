@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(prevState: any, formData: FormData) {
   const email = formData.get('email')
   const password = formData.get('password')
 
@@ -33,7 +33,7 @@ export async function loginAction(formData: FormData) {
   redirect('/dashboard')
 }
 
-export async function registerAction(formData: FormData) {
+export async function registerAction(prevState: any, formData: FormData) {
   const name = formData.get('name')
   const email = formData.get('email')
   const password = formData.get('password')
