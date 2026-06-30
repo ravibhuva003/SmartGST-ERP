@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: smartgst-api
+    env: node
+    buildCommand: npm install && npx prisma generate --schema=./packages/database/prisma/schema.prisma && npm run build --workspace=api
+    startCommand: npm run start:prod --workspace=api
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
