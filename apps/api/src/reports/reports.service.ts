@@ -26,8 +26,8 @@ export class ReportsService {
     });
 
     // Aggregate B2B and B2C based on customer GSTIN presence
-    const b2b = invoices.filter(inv => inv.customer.gstin);
-    const b2c = invoices.filter(inv => !inv.customer.gstin);
+    const b2b = invoices.filter((inv: any) => inv.customer.gstin);
+    const b2c = invoices.filter((inv: any) => !inv.customer.gstin);
 
     const calculateTotals = (invs: any[]) => {
       return invs.reduce((acc, curr) => {
