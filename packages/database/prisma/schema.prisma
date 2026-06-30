@@ -7,68 +7,120 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  phone     String?  @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  businesses BusinessUser[]
-}
-
-model Business {
-  id          String   @id @default(uuid())
-  gstin       String?
-  name        String
-  address     String?
-  stateCode   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  users       BusinessUser[]
-  invoices    Invoice[]
-  items       Item[]
-  customers   Customer[]
-}
-
 enum Role {
-  OWNER
-  ADMIN
-  MEMBER
+  SUPER_ADMIN
+  COMPANY_OWNER
+  BRANCH_MANAGER
+  ACCOUNTANT
+  SALES_EXECUTIVE
+  INVENTORY_MANAGER
+  SUPPORT
+  AUDITOR
+  READ_ONLY
 }
 
-model BusinessUser {
-  userId     String
-  businessId String
-  role       Role     @default(MEMBER)
-  user       User     @relation(fields: [userId], references: [id])
-  business   Business @relation(fields: [businessId], references: [id])
-  @@id([userId, businessId])
+model User {
+  id               String          @id @default(uuid())
+  email            String          @unique
+  phone            String?         @unique
+  password         String?         // Optional for Google Login
+  name             String?
+  isEmailVerified  Boolean         @default(false)
+  isPhoneVerified  Boolean         @default(false)
+  googleId         String?         @unique
+  twoFactorEnabled Boolean         @default(false)
+  twoFactorSecret  String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  
+  companies        CompanyUser[]
+  deviceSessions   DeviceSession[]
 }
+
+model DeviceSession {
+  id           String   @id @default(uuid())
+  userId       String
+  deviceOs     String?
+  ipAddress    String?
+  refreshToken String?  @unique
+  lastActiveAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+  
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Company {
+  id           String        @id @default(uuid())
+  name         String
+  panNumber    String?
+  website      String?
+  contactEmail String?
+  logoUrl      String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  
+  users        CompanyUser[]
+  branches     Branch[]
+  customers    Customer[]
+  items        Item[]
+  invoices     Invoice[]
+}
+
+model Branch {
+  id         String   @id @default(uuid())
+  companyId  String
+  name       String
+  address    String?
+  gstin      String?
+  stateCode  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  users      CompanyUser[]
+}
+
+model CompanyUser {
+  id         String   @id @default(uuid())
+  userId     String
+  companyId  String
+  branchId   String?  // If null, they have company-wide access
+  role       Role     @default(READ_ONLY)
+  createdAt  DateTime @default(now())
+  
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  branch     Branch?  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId, branchId])
+}
+
+// -----------------------------------------------------------------------------
+// Legacy Phase models (To be expanded in later phases)
+// -----------------------------------------------------------------------------
 
 model Customer {
   id         String   @id @default(uuid())
-  businessId String
+  companyId  String
   name       String
   email      String?
   phone      String?
   gstin      String?
   address    String?
   stateCode  String?
-  business   Business @relation(fields: [businessId], references: [id])
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   invoices   Invoice[]
 }
 
 model Item {
-  id         String   @id @default(uuid())
-  businessId String
-  name       String
-  hsnSac     String?
-  price      Decimal
-  taxRate    Decimal
-  stock      Int      @default(0)
-  business   Business @relation(fields: [businessId], references: [id])
+  id           String        @id @default(uuid())
+  companyId    String
+  name         String
+  hsnSac       String?
+  price        Decimal
+  taxRate      Decimal
+  stock        Int           @default(0)
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   invoiceItems InvoiceItem[]
 }
 
@@ -80,20 +132,20 @@ enum InvoiceType {
 }
 
 model Invoice {
-  id            String   @id @default(uuid())
-  businessId    String
+  id            String        @id @default(uuid())
+  companyId     String
   customerId    String
-  type          InvoiceType @default(SALES)
+  type          InvoiceType   @default(SALES)
   invoiceNumber String
   date          DateTime
   totalAmount   Decimal
   cgst          Decimal
   sgst          Decimal
   igst          Decimal
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  business      Business @relation(fields: [businessId], references: [id])
-  customer      Customer @relation(fields: [customerId], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
   items         InvoiceItem[]
 }
 
@@ -107,6 +159,6 @@ model InvoiceItem {
   cgst       Decimal
   sgst       Decimal
   igst       Decimal
-  invoice    Invoice  @relation(fields: [invoiceId], references: [id])
-  item       Item     @relation(fields: [itemId], references: [id])
+  invoice    Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  item       Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
 }

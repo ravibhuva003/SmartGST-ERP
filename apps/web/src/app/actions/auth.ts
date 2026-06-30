@@ -37,11 +37,12 @@ export async function registerAction(prevState: any, formData: FormData) {
   const name = formData.get('name')
   const email = formData.get('email')
   const password = formData.get('password')
+  const companyName = formData.get('companyName')
 
   const res = await fetch(`${API_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password }),
+    body: JSON.stringify({ name, email, password, companyName }),
   })
 
   if (!res.ok) {
