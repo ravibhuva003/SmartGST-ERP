@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  phone     String?  @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  businesses BusinessUser[]
+}
+
+model Business {
+  id          String   @id @default(uuid())
+  gstin       String?
+  name        String
+  address     String?
+  stateCode   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       BusinessUser[]
+  invoices    Invoice[]
+  items       Item[]
+  customers   Customer[]
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model BusinessUser {
+  userId     String
+  businessId String
+  role       Role     @default(MEMBER)
+  user       User     @relation(fields: [userId], references: [id])
+  business   Business @relation(fields: [businessId], references: [id])
+  @@id([userId, businessId])
+}
+
+model Customer {
+  id         String   @id @default(uuid())
+  businessId String
+  name       String
+  email      String?
+  phone      String?
+  gstin      String?
+  address    String?
+  stateCode  String?
+  business   Business @relation(fields: [businessId], references: [id])
+  invoices   Invoice[]
+}
+
+model Item {
+  id         String   @id @default(uuid())
+  businessId String
+  name       String
+  hsnSac     String?
+  price      Decimal
+  taxRate    Decimal
+  stock      Int      @default(0)
+  business   Business @relation(fields: [businessId], references: [id])
+  invoiceItems InvoiceItem[]
+}
+
+enum InvoiceType {
+  SALES
+  PURCHASE
+  PROFORMA
+  DELIVERY_CHALLAN
+}
+
+model Invoice {
+  id            String   @id @default(uuid())
+  businessId    String
+  customerId    String
+  type          InvoiceType @default(SALES)
+  invoiceNumber String
+  date          DateTime
+  totalAmount   Decimal
+  cgst          Decimal
+  sgst          Decimal
+  igst          Decimal
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  business      Business @relation(fields: [businessId], references: [id])
+  customer      Customer @relation(fields: [customerId], references: [id])
+  items         InvoiceItem[]
+}
+
+model InvoiceItem {
+  id         String   @id @default(uuid())
+  invoiceId  String
+  itemId     String
+  quantity   Int
+  rate       Decimal
+  amount     Decimal
+  cgst       Decimal
+  sgst       Decimal
+  igst       Decimal
+  invoice    Invoice  @relation(fields: [invoiceId], references: [id])
+  item       Item     @relation(fields: [itemId], references: [id])
+}
