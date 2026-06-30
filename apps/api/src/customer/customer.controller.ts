@@ -1,24 +1,39 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('Customers')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('customers')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
   @Post()
-  create(@Body() createCustomerDto: any, @Query('businessId') businessId: string, @Request() req: any) {
-    return this.customerService.create(createCustomerDto, businessId, req.user.id);
+  create(@Request() req: any, @Body() createCustomerDto: any) {
+    // In a real app, companyId should be passed or inferred from the user's active company context
+    return this.customerService.create(createCustomerDto.companyId, createCustomerDto);
   }
 
   @Get()
-  findAll(@Query('businessId') businessId: string, @Request() req: any) {
-    return this.customerService.findAll(businessId, req.user.id);
+  findAll(@Request() req: any) {
+    // Fetch customers for the user's companies
+    return this.customerService.findAllForUser(req.user.sub);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @Query('businessId') businessId: string, @Request() req: any) {
-    return this.customerService.findOne(id, businessId, req.user.id);
+  findOne(@Param('id') id: string) {
+    return this.customerService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateCustomerDto: any) {
+    return this.customerService.update(id, updateCustomerDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.customerService.remove(id);
   }
 }

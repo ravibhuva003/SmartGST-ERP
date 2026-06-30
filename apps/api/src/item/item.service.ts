@@ -1,40 +1,58 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ItemService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: any, businessId: string, userId: string) {
-    await this.verifyBusinessAccess(businessId, userId);
+  create(companyId: string, data: any) {
     return this.prisma.item.create({
       data: {
         ...data,
-        businessId,
+        companyId,
       },
     });
   }
 
-  async findAll(businessId: string, userId: string) {
-    await this.verifyBusinessAccess(businessId, userId);
+  async findAllForUser(userId: string) {
+    const userCompanies = await this.prisma.companyUser.findMany({
+      where: { userId },
+      select: { companyId: true }
+    });
+    
+    const companyIds = userCompanies.map(uc => uc.companyId);
+
     return this.prisma.item.findMany({
-      where: { businessId },
+      where: {
+        companyId: {
+          in: companyIds
+        }
+      },
+      include: {
+        category: true,
+      }
     });
   }
 
-  async findOne(id: string, businessId: string, userId: string) {
-    await this.verifyBusinessAccess(businessId, userId);
-    return this.prisma.item.findFirst({
-      where: { id, businessId },
+  findOne(id: string) {
+    return this.prisma.item.findUnique({
+      where: { id },
+      include: {
+        category: true,
+      }
     });
   }
 
-  private async verifyBusinessAccess(businessId: string, userId: string) {
-    const access = await this.prisma.businessUser.findFirst({
-      where: { businessId, userId },
+  update(id: string, data: any) {
+    return this.prisma.item.update({
+      where: { id },
+      data,
     });
-    if (!access) {
-      throw new UnauthorizedException('You do not have access to this business');
-    }
+  }
+
+  remove(id: string) {
+    return this.prisma.item.delete({
+      where: { id },
+    });
   }
 }

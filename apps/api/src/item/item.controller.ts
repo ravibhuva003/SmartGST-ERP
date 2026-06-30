@@ -1,24 +1,37 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { ItemService } from './item.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiTags('Items')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('items')
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
   @Post()
-  create(@Body() createItemDto: any, @Query('businessId') businessId: string, @Request() req: any) {
-    return this.itemService.create(createItemDto, businessId, req.user.id);
+  create(@Request() req: any, @Body() createItemDto: any) {
+    return this.itemService.create(createItemDto.companyId, createItemDto);
   }
 
   @Get()
-  findAll(@Query('businessId') businessId: string, @Request() req: any) {
-    return this.itemService.findAll(businessId, req.user.id);
+  findAll(@Request() req: any) {
+    return this.itemService.findAllForUser(req.user.sub);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @Query('businessId') businessId: string, @Request() req: any) {
-    return this.itemService.findOne(id, businessId, req.user.id);
+  findOne(@Param('id') id: string) {
+    return this.itemService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateItemDto: any) {
+    return this.itemService.update(id, updateItemDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.itemService.remove(id);
   }
 }

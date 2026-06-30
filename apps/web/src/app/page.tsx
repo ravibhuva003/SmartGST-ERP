@@ -11,10 +11,10 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/20">
-              E
+              S
             </div>
             <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">
-              AI GST ERP <span className="text-sm font-normal text-slate-500 hidden sm:inline">by Ekcero</span>
+              SmartGST ERP
             </span>
           </div>
           <nav className="hidden md:flex gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
@@ -131,7 +131,7 @@ export default function LandingPage() {
             <div className="text-center max-w-3xl mx-auto mb-16">
               <h2 className="text-3xl md:text-5xl font-bold mb-6">Everything you need to scale</h2>
               <p className="text-lg text-slate-600 dark:text-slate-400">
-                Stop juggling spreadsheets and legacy software. AI GST ERP provides a unified, AI-powered platform designed exclusively for modern Indian enterprises.
+                Stop juggling spreadsheets and legacy software. SmartGST ERP provides a unified, highly scalable platform designed exclusively for modern Indian enterprises.
               </p>
             </div>
             
@@ -225,7 +225,7 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Trusted by 10,000+ Indian Businesses</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {[
-                { quote: "AI GST ERP cut our billing time in half. The automatic GSTR-3B calculation and AI OCR is flawless.", author: "Rajesh Kumar", role: "Director, RK Electronics" },
+                { quote: "SmartGST ERP cut our billing time in half. The automatic GSTR-3B calculation and seamless dashboard is flawless.", author: "Rajesh Kumar", role: "Director, RK Electronics" },
                 { quote: "The multi-business feature is a lifesaver. I manage 4 different GSTINs from one single login.", author: "Sneha Patel", role: "CA, Patel & Associates" },
                 { quote: "Finally, a cloud ERP that feels modern and fast. The invoice aesthetics impress all our clients.", author: "Amit Sharma", role: "Founder, Sharma Logistics" },
               ].map((t, i) => (
@@ -244,6 +244,54 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* PRICING SECTION */}
+        <section id="pricing" className="py-24 bg-slate-50 dark:bg-slate-950">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Simple, Transparent Pricing</h2>
+            <p className="text-center text-slate-600 dark:text-slate-400 mb-16 max-w-2xl mx-auto">Choose the perfect plan for your business size.</p>
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {[
+                { name: "Free", price: "₹0", desc: "Perfect for new businesses", features: ["Up to 50 invoices/month", "1 User", "Basic GST Reports"] },
+                { name: "Premium", price: "₹999/mo", desc: "For growing companies", features: ["Unlimited Invoices", "5 Users", "Multi-branch Support", "E-Way Bills"] },
+                { name: "Enterprise", price: "Custom", desc: "For large scale operations", features: ["Unlimited Everything", "Dedicated Account Manager", "Custom Integrations", "On-premise deployment"] }
+              ].map((plan, i) => (
+                <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 flex flex-col">
+                  <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+                  <p className="text-slate-500 mb-6">{plan.desc}</p>
+                  <div className="text-4xl font-bold mb-8">{plan.price}</div>
+                  <ul className="space-y-4 mb-8 flex-1">
+                    {plan.features.map((f, j) => (
+                      <li key={j} className="flex items-center gap-3"><CheckCircle2 className="size-5 text-indigo-500" /> {f}</li>
+                    ))}
+                  </ul>
+                  <Button variant={i === 1 ? 'default' : 'outline'} className="w-full">
+                    {i === 2 ? 'Contact Sales' : 'Get Started'}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ SECTION */}
+        <section id="faq" className="py-24 bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Frequently Asked Questions</h2>
+            <div className="space-y-8">
+              {[
+                { q: "Is my data secure?", a: "Yes, we use bank-grade 256-bit encryption. Your data is backed up automatically across multiple data centers." },
+                { q: "Can I use SmartGST ERP on my mobile phone?", a: "Absolutely! Our platform is a fully responsive Progressive Web App (PWA) that works beautifully on any device." },
+                { q: "Do you support thermal printing for retail?", a: "Yes, we have specialized invoice formats perfectly optimized for 2-inch and 3-inch thermal printers." }
+              ].map((faq, i) => (
+                <div key={i}>
+                  <h4 className="text-xl font-bold mb-2">{faq.q}</h4>
+                  <p className="text-slate-600 dark:text-slate-400">{faq.a}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* CTA SECTION */}
         <section className="py-24 relative overflow-hidden">
           <div className="absolute inset-0 bg-indigo-600" />
@@ -251,7 +299,7 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 relative z-10 text-center text-white">
             <h2 className="text-4xl md:text-5xl font-extrabold mb-6">Ready to modernize your billing?</h2>
             <p className="text-xl text-indigo-100 mb-10 max-w-2xl mx-auto">
-              Join thousands of businesses who have made the switch to Ekcero Infotech's AI GST ERP. Get set up in less than 5 minutes.
+              Join thousands of businesses who have made the switch to SmartGST ERP. Get set up in less than 5 minutes.
             </p>
             <Link href="/auth/register">
               <Button size="lg" className="bg-white text-indigo-600 hover:bg-slate-100 rounded-full h-14 px-10 text-lg shadow-2xl hover:scale-105 transition-transform duration-300">
@@ -269,15 +317,15 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             <div className="col-span-2">
               <div className="flex items-center gap-2 mb-4">
-                <div className="size-6 rounded-md bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">E</div>
-                <span className="text-lg font-bold">Ekcero Infotech</span>
+                <div className="size-6 rounded-md bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">S</div>
+                <span className="text-lg font-bold">SmartGST ERP</span>
               </div>
               <p className="text-slate-500 max-w-sm mb-4">
-                The modern standard for Indian billing, inventory, and AI GST compliance. Built with ❤️ for Bharat.
+                The modern standard for Indian billing, inventory, and GST compliance. Built with ❤️ for Bharat.
                 <br /><br />
-                <a href="mailto:ekceroinfotech@gmail.com" className="hover:text-indigo-600 block">ekceroinfotech@gmail.com</a>
+                <a href="mailto:support@smartgst.erp" className="hover:text-indigo-600 block">support@smartgst.erp</a>
                 <a href="tel:+919773063667" className="hover:text-indigo-600 block">+91 9773063667</a>
-                <a href="https://www.ekcero.com" target="_blank" rel="noreferrer" className="hover:text-indigo-600 block">www.ekcero.com</a>
+                <a href="https://www.smartgst.erp" target="_blank" rel="noreferrer" className="hover:text-indigo-600 block">www.smartgst.erp</a>
               </p>
             </div>
             <div>
@@ -300,7 +348,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="pt-8 border-t border-slate-200 dark:border-slate-800 text-center text-slate-500 text-sm">
-            © {new Date().getFullYear()} Ekcero Infotech. All rights reserved.
+            © {new Date().getFullYear()} SmartGST ERP. All rights reserved.
           </div>
         </div>
       </footer>
