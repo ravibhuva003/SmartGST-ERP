@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { loginAction } from '@/app/actions/auth'
+import { loginAction, googleLoginAction } from '@/app/actions/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -51,11 +51,7 @@ export default function LoginPage() {
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-            <form action={async () => {
-              'use server'
-              const { googleLoginAction } = await import('@/app/actions/auth')
-              await googleLoginAction()
-            }}>
+            <form action={googleLoginAction}>
               <Button variant="outline" type="submit" className="w-full">
                 Google
               </Button>
