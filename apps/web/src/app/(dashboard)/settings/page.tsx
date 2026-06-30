@@ -1,111 +1,143 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState } from 'react'
+import { Save, UploadCloud } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function SettingsPage() {
-  const [companies, setCompanies] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [formData, setFormData] = useState({
+    name: 'Ekcero Infotech',
+    pan: 'ABCDE1234F',
+    gstin: '27ABCDE1234F1Z5',
+    email: 'contact@ekcero.com',
+    phone: '+91 9876543210',
+    address: '123 Tech Park, Mumbai, Maharashtra 400001',
+    website: 'https://ekcero.com'
+  })
 
-  useEffect(() => {
-    async function fetchCompanies() {
-      try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-        const res = await fetch(`${API_URL}/companies`, {
-          // Add auth headers when implementing client fetching hook
-        })
-        if (res.ok) {
-          const data = await res.json()
-          setCompanies(data)
-        }
-      } catch (e) {
-        console.error(e)
-      } finally {
-        setLoading(false)
-      }
-    }
-    
-    // Stub for UI, real fetch requires Bearer token from cookies/context
-    setLoading(false)
-  }, [])
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    // API Call to PATCH /companies/:id
+    console.log('Updating company profile:', formData)
+    alert('Company profile updated successfully!')
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-5xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Company Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your company details, branches, and team members.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <p className="text-slate-500">Manage your company profile, tax details, and branding.</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Company Details</CardTitle>
-            <CardDescription>Update your company's primary information.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="companyName">Company Name</Label>
-                <Input id="companyName" defaultValue="Ekcero Infotech" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="pan">PAN Number</Label>
-                <Input id="pan" placeholder="ABCDE1234F" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Contact Email</Label>
-                <Input id="email" type="email" placeholder="contact@company.com" />
-              </div>
-              <Button type="button">Save Changes</Button>
-            </form>
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="general">General Profile</TabsTrigger>
+          <TabsTrigger value="tax">Tax & Legal</TabsTrigger>
+          <TabsTrigger value="branding">Branding</TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Branches</CardTitle>
-            <CardDescription>Manage your store locations and branches.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="rounded-md border p-4 flex justify-between items-center">
-                <div>
-                  <h4 className="font-medium">Head Office</h4>
-                  <p className="text-sm text-muted-foreground">Main HQ</p>
+        <form onSubmit={handleSubmit}>
+          {/* GENERAL TAB */}
+          <TabsContent value="general" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Company Details</CardTitle>
+                <CardDescription>This information will be displayed on your invoices.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Company Name <span className="text-red-500">*</span></Label>
+                  <Input id="name" name="name" required value={formData.name} onChange={handleChange} />
                 </div>
-                <Button variant="outline" size="sm">Edit</Button>
-              </div>
-              <Button variant="secondary" className="w-full">Add New Branch</Button>
-            </div>
-          </CardContent>
-        </Card>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Contact Email</Label>
+                    <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Contact Phone</Label>
+                    <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleChange} />
+                  </div>
+                </div>
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Team & Access</CardTitle>
-            <CardDescription>Invite members and assign roles across branches.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <div className="p-4 flex justify-between items-center border-b">
-                <div>
-                  <h4 className="font-medium">You</h4>
-                  <p className="text-sm text-muted-foreground">COMPANY_OWNER</p>
+                <div className="space-y-2">
+                  <Label htmlFor="website">Website</Label>
+                  <Input id="website" name="website" type="url" value={formData.website} onChange={handleChange} />
                 </div>
-                <span className="text-sm text-green-600 bg-green-100 px-2 py-1 rounded">Active</span>
-              </div>
-              <div className="p-4">
-                <Button variant="outline">Invite Team Member</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="address">Registered Address</Label>
+                  <textarea 
+                    id="address" name="address" 
+                    value={formData.address} onChange={handleChange} 
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* TAX TAB */}
+          <TabsContent value="tax" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Tax & Legal Details</CardTitle>
+                <CardDescription>Crucial for GST compliance and invoice generation.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="gstin">GSTIN <span className="text-red-500">*</span></Label>
+                    <Input id="gstin" name="gstin" required value={formData.gstin} onChange={handleChange} className="uppercase font-mono" maxLength={15} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="pan">PAN Number</Label>
+                    <Input id="pan" name="pan" value={formData.pan} onChange={handleChange} className="uppercase font-mono" maxLength={10} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* BRANDING TAB */}
+          <TabsContent value="branding" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Company Logo</CardTitle>
+                <CardDescription>Upload a logo to brand your invoices.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900">
+                  <div className="size-16 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4">
+                    <UploadCloud className="size-8" />
+                  </div>
+                  <h3 className="font-medium text-lg">Click to upload logo</h3>
+                  <p className="text-sm text-slate-500 mt-1">SVG, PNG, JPG or GIF (max. 2MB)</p>
+                  
+                  {/* Non-functional mock upload button */}
+                  <Button type="button" variant="outline" className="mt-6">Select File</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Save Button */}
+          <div className="mt-6 flex justify-end">
+            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[150px]">
+              <Save className="mr-2 size-4" /> Save Changes
+            </Button>
+          </div>
+        </form>
+      </Tabs>
     </div>
   )
 }

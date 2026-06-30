@@ -81,4 +81,29 @@ export class CompaniesService {
       where: { companyId }
     });
   }
+
+  async update(id: string, data: any, userId: string) {
+    const access = await this.prisma.companyUser.findFirst({
+      where: { userId, companyId: id },
+    });
+
+    if (!access || access.role !== 'COMPANY_OWNER') {
+      throw new ForbiddenException('Only Company Owners can update company settings');
+    }
+
+    // Ensure we only update allowed fields
+    const { name, pan, gstin, address, website, logo } = data;
+
+    return this.prisma.company.update({
+      where: { id },
+      data: {
+        ...(name && { name }),
+        ...(pan && { pan }),
+        ...(gstin && { gstin }),
+        ...(address && { address }),
+        ...(website && { website }),
+        ...(logo && { logo }),
+      },
+    });
+  }
 }

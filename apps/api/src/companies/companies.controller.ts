@@ -17,6 +17,11 @@ export class CompaniesController {
     return this.companiesService.findOne(id, req.user.sub);
   }
 
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateData: any, @Request() req: any) {
+    return this.companiesService.update(id, updateData, req.user.sub);
+  }
+
   @Post(':id/branches')
   createBranch(
     @Param('id') id: string,
